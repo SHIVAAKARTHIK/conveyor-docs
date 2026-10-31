@@ -1,0 +1,17 @@
+# The code lives in its own repositories; this repo is the documentation, demos and overview.
+/backend/
+/admin-web/
+/conveyor-firmware/
+
+# Old Android app, replaced by the web app (large, mostly build files)
+/android-app/
+
+# Local tooling and Office temp files
+/.claude/
+~$*
+
+# Superseded draft of a report chapter
+/docs/report/*-before-web-only.docx
+
+# Phase 1 submission, kept out until the owner says it can be shared
+/PHASE 1 REPORT FF.pdf

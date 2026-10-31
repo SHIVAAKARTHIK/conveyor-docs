@@ -1,0 +1,747 @@
+<title>MediDispense Conveyor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #EEF3F3;
+    --surface: #FFFFFF;
+    --surface-2: #F5FAFA;
+    --line: #D2E0E1;
+    --line-strong: #B4C9CB;
+    --ink: #0D1A1F;
+    --muted: #5B7A83;
+    --accent: #0C8F70;
+    --accent-soft: #D7F3EA;
+    --amber: #B36F04;
+    --amber-fill: #F0A020;
+    --amber-soft: #FCEBCF;
+    --belt: #DCE7E8;
+    --belt-line: #AFC4C6;
+    --housing: #E4EDEE;
+    --shadow: 0 1px 2px rgba(13,26,31,.06), 0 8px 24px rgba(13,26,31,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #08151A;
+      --surface: #112229;
+      --surface-2: #0D1D23;
+      --line: #21414C;
+      --line-strong: #2E5A68;
+      --ink: #DDEFF1;
+      --muted: #7CA1AA;
+      --accent: #42E0B0;
+      --accent-soft: #0E332C;
+      --amber: #FFB13D;
+      --amber-fill: #F0A020;
+      --amber-soft: #3A2910;
+      --belt: #1A323A;
+      --belt-line: #2C525E;
+      --housing: #162C34;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #08151A;
+    --surface: #112229;
+    --surface-2: #0D1D23;
+    --line: #21414C;
+    --line-strong: #2E5A68;
+    --ink: #DDEFF1;
+    --muted: #7CA1AA;
+    --accent: #42E0B0;
+    --accent-soft: #0E332C;
+    --amber: #FFB13D;
+    --amber-fill: #F0A020;
+    --amber-soft: #3A2910;
+    --belt: #1A323A;
+    --belt-line: #2C525E;
+    --housing: #162C34;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 22px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  /* ---------- header ---------- */
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 46px);
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .lede {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* ---------- stage ---------- */
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .stage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+  .machine-name {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .state-pill {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    white-space: nowrap;
+  }
+  .bed-switch { display: inline-flex; align-items: center; gap: 8px; }
+  .switch-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  }
+  button.seg {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px; letter-spacing: .06em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  button.seg:hover { color: var(--ink); }
+  button.seg.is-on {
+    background: var(--ink); color: var(--bg); border-color: var(--ink);
+  }
+  button.seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .svg-holder { padding: 8px 6px 0; overflow-x: auto; }
+  svg.machine { display: block; width: 100%; min-width: 720px; height: auto; }
+
+  /* ---------- controls ---------- */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px 18px;
+    flex-wrap: wrap;
+  }
+  button.ctl {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bg);
+    background: var(--ink);
+    border: none;
+    border-radius: 999px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: opacity .15s ease;
+  }
+  button.ctl.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+  }
+  button.ctl:hover { opacity: .82; }
+  button.ctl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .clock {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .track-wrap { flex: 1 1 320px; min-width: 260px; }
+  .track {
+    position: relative;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--belt);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    width: 100%;
+    display: block;
+  }
+  .track:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .track-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 999px;
+    background: var(--accent);
+    pointer-events: none;
+  }
+  .track-mark {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 14px;
+    background: var(--line-strong);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+  .phase-label {
+    margin-top: 9px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .phase-label b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- panels ---------- */
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 17px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 168px;
+  }
+  .panel h3 {
+    margin: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .panel .headline {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+  .panel .body { font-size: 14px; color: var(--muted); margin: 0; }
+  .kv {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+    padding: 5px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .kv span:first-child { color: var(--muted); }
+  .kv span:last-child { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+
+  .badge {
+    align-self: flex-start;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--belt);
+    color: var(--muted);
+    transition: background .3s ease, color .3s ease;
+  }
+  .badge.live { background: var(--amber-soft); color: var(--amber); }
+  .badge.done { background: var(--accent-soft); color: var(--accent); }
+
+  /* ---------- log ---------- */
+  .log {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .log h3 {
+    margin: 0 0 12px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .log ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  .log li {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    color: var(--muted);
+    opacity: .28;
+    transition: opacity .35s ease, background .35s ease, color .35s ease;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .log li.on { opacity: 1; color: var(--ink); background: var(--surface-2); }
+  .log li .m { color: var(--accent); font-weight: 500; }
+  .log li .code { color: var(--amber); }
+
+  .foot {
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+    max-width: 72ch;
+  }
+  .foot strong { color: var(--ink); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Phase 3 · Bed-addressed dispensing</p>
+    <h1>One prescription, one button, one belt.</h1>
+    <p class="lede">
+      The complete run of the MediDispense conveyor station — from a doctor writing a
+      prescription to the medicine landing in the right patient's bed tray. Everything
+      below happens over WiFi; nothing is tethered to a laptop.
+    </p>
+  </header>
+
+  <section class="stage">
+    <div class="stage-head">
+      <span class="machine-name">Station&nbsp;01 · ESP32 · 192.168.0.105</span>
+      <span class="bed-switch">
+        <span class="switch-label">Deliver to</span>
+        <button type="button" class="seg" id="bed1Btn">Bed 1</button>
+        <button type="button" class="seg is-on" id="bed2Btn">Bed 2</button>
+      </span>
+      <span class="state-pill" id="statePill">IDLE</span>
+    </div>
+
+    <div class="svg-holder">
+      <svg class="machine" viewBox="0 0 920 380" role="img"
+           aria-label="Top-down view of the conveyor: a belt carries a medicine box past Bed 1 to Bed 2, where a servo pushes it into the bed tray.">
+
+        <!-- chutes -->
+        <path id="chute1" d="M362 172 L446 172 L436 244 L372 244 Z" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+        <path id="chute2" d="M582 172 L666 172 L656 244 L592 244 Z" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+
+        <!-- bed trays -->
+        <g id="bed1">
+          <rect x="356" y="246" width="96" height="70" rx="10" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
+          <rect x="372" y="268" width="64" height="28" rx="5" fill="var(--belt)"/>
+          <rect x="372" y="262" width="20" height="12" rx="4" fill="var(--line-strong)"/>
+          <text x="404" y="336" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1.5" fill="var(--muted)">BED 1</text>
+        </g>
+        <g id="bed2">
+          <rect x="576" y="246" width="96" height="70" rx="10" fill="var(--surface-2)" stroke="var(--line)" stroke-width="2"/>
+          <rect x="592" y="268" width="64" height="28" rx="5" fill="var(--belt)"/>
+          <rect x="592" y="262" width="20" height="12" rx="4" fill="var(--line-strong)"/>
+          <text x="624" y="336" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="1.5" fill="var(--muted)">BED 2</text>
+        </g>
+
+        <!-- rollers -->
+        <circle cx="96" cy="132" r="27" fill="var(--housing)" stroke="var(--line-strong)" stroke-width="2"/>
+        <circle cx="824" cy="132" r="27" fill="var(--housing)" stroke="var(--line-strong)" stroke-width="2"/>
+        <circle id="rollerHub" cx="96" cy="132" r="9" fill="var(--line-strong)"/>
+
+        <!-- belt -->
+        <defs>
+          <clipPath id="beltClip"><rect x="96" y="92" width="728" height="80"/></clipPath>
+        </defs>
+        <rect x="96" y="92" width="728" height="80" fill="var(--belt)" stroke="var(--line)" stroke-width="1.5"/>
+        <g id="beltLines" clip-path="url(#beltClip)" stroke="var(--belt-line)" stroke-width="2" stroke-linecap="round">
+          <line x1="0" y1="106" x2="920" y2="106" stroke-dasharray="16 26"/>
+          <line x1="0" y1="132" x2="920" y2="132" stroke-dasharray="16 26"/>
+          <line x1="0" y1="158" x2="920" y2="158" stroke-dasharray="16 26"/>
+        </g>
+
+        <!-- loading zone -->
+        <rect x="106" y="98" width="72" height="68" rx="8" fill="none" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <text x="142" y="82" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--muted)">LOAD</text>
+
+        <!-- one IR beam per pusher line -->
+        <g id="ir1">
+          <line class="beam" x1="346" y1="92" x2="346" y2="172" stroke="var(--line-strong)" stroke-width="2" stroke-dasharray="4 6"/>
+          <circle class="dot" cx="346" cy="84" r="5" fill="var(--line-strong)"/>
+          <text x="346" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1" fill="var(--muted)">IR 1</text>
+        </g>
+        <g id="ir2">
+          <line class="beam" x1="566" y1="92" x2="566" y2="172" stroke="var(--line-strong)" stroke-width="2" stroke-dasharray="4 6"/>
+          <circle class="dot" cx="566" cy="84" r="5" fill="var(--line-strong)"/>
+          <text x="566" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1" fill="var(--muted)">IR 2</text>
+        </g>
+
+        <!-- pushers -->
+        <g id="pusher1">
+          <rect x="378" y="36" width="52" height="26" rx="6" fill="var(--housing)" stroke="var(--line-strong)" stroke-width="2"/>
+          <rect id="rod1" x="398" y="60" width="12" height="18" rx="3" fill="var(--line-strong)"/>
+          <text x="404" y="26" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1" fill="var(--muted)">SERVO 1</text>
+        </g>
+        <g id="pusher2">
+          <rect x="598" y="36" width="52" height="26" rx="6" fill="var(--housing)" stroke="var(--line-strong)" stroke-width="2"/>
+          <rect id="rod2" x="618" y="60" width="12" height="18" rx="3" fill="var(--line-strong)"/>
+          <text x="624" y="26" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1" fill="var(--muted)">SERVO 2</text>
+        </g>
+
+        <!-- the medicine box -->
+        <g id="box" opacity="0">
+          <rect x="-22" y="-22" width="44" height="44" rx="7" fill="var(--amber-fill)"/>
+          <rect x="-22" y="-22" width="44" height="44" rx="7" fill="none" stroke="var(--amber)" stroke-width="2"/>
+          <path d="M-9 0 H9 M0 -9 V9" stroke="#3A2910" stroke-width="3.5" stroke-linecap="round" opacity=".75"/>
+        </g>
+
+        <!-- buzzer -->
+        <g id="buzzer" opacity="0">
+          <circle cx="864" cy="60" r="13" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="2"/>
+          <path d="M858 60 h4 l4 -5 v10 l-4 -5 h-4 z" fill="var(--amber)"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <button class="ctl" id="playBtn" type="button">Play</button>
+      <button class="ctl ghost" id="restartBtn" type="button">Restart</button>
+      <span class="clock" id="clock">0.0s</span>
+      <div class="track-wrap">
+        <button class="track" id="track" type="button" aria-label="Scrub the run">
+          <span class="track-fill" id="trackFill"></span>
+        </button>
+        <div class="phase-label">Step <b id="phaseNum">1</b> / 9 &nbsp;·&nbsp; <b id="phaseName">Station idle</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panels">
+    <article class="panel">
+      <h3>Doctor · Android app</h3>
+      <span class="badge" id="docBadge">Waiting</span>
+      <div class="headline" id="docHead">No prescription yet</div>
+      <p class="body" id="docBody">The doctor picks a patient and writes what they need.</p>
+      <div class="kv"><span>Patient</span><span id="docPatient">—</span></div>
+      <div class="kv"><span>Bed</span><span id="docBed">—</span></div>
+    </article>
+
+    <article class="panel">
+      <h3>Backend · delivery record</h3>
+      <span class="badge" id="beBadge">No job</span>
+      <div class="headline" id="beHead">Queue empty</div>
+      <p class="body" id="beBody">Every state change is stored and pushed live to the dashboard.</p>
+      <div class="kv"><span>Status</span><span id="beStatus">—</span></div>
+      <div class="kv"><span>bed_no</span><span id="beBed">—</span></div>
+    </article>
+
+    <article class="panel">
+      <h3>Station · ESP32</h3>
+      <span class="badge" id="stBadge">Idle</span>
+      <div class="headline" id="stHead">Polling for work</div>
+      <p class="body" id="stBody">Asks the backend for a job every 4 seconds. No cable to any laptop.</p>
+      <div class="kv"><span>Belt</span><span id="stBelt">stopped</span></div>
+      <div class="kv"><span>Target</span><span id="stTarget">—</span></div>
+    </article>
+  </section>
+
+  <section class="log">
+    <h3>What the station actually calls</h3>
+    <ol id="logList">
+      <li data-t="0.4"><span class="m">GET</span> /conveyor/next-job → <span class="code">204 No Content</span></li>
+      <li data-t="3.2"><span class="m">POST</span> /prescriptions → <span class="code">201 Created</span></li>
+      <li data-t="5.4"><span class="m">GET</span> /conveyor/next-job → <span class="code">200</span> {delivery_id, bed_no:"2"}</li>
+      <li data-t="9.8"><span class="m">POST</span> /deliveries/{id}/dispatch → <span class="code">200</span> in_transit</li>
+      <li data-t="18.2"><span class="m">POST</span> /deliveries/{id}/mark-arrived → <span class="code">200</span> arrived</li>
+      <li data-t="20.6"><span class="m">GET</span> /conveyor/next-job → <span class="code">204 No Content</span></li>
+    </ol>
+  </section>
+
+  <p class="foot">
+    <strong>Two human actions in the whole run:</strong> the doctor writes the prescription,
+    and someone presses one button on the machine. Everything between is the station talking
+    to the backend by itself. This build has no scanning step — it automates and records
+    delivery, it does not verify it.
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DURATION = 22;
+
+  var PHASES = [
+    { t: 0,    name: "Station idle" },
+    { t: 2.5,  name: "Doctor prescribes" },
+    { t: 5.0,  name: "Job picked up" },
+    { t: 7.0,  name: "Box loaded" },
+    { t: 9.5,  name: "Button pressed" },
+    { t: 10.5, name: "Belt running" },
+    { t: 15.5, name: "Box detected" },
+    { t: 16.8, name: "Pushed to target bed" },
+    { t: 18.5, name: "Delivered" }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var els = {
+    pill: $("statePill"), box: $("box"), beltLines: $("beltLines"),
+    rod1: $("rod1"), rod2: $("rod2"),
+    ir1: $("ir1"), ir2: $("ir2"),
+    bed1: $("bed1"), bed2: $("bed2"),
+    chute1: $("chute1"), chute2: $("chute2"), buzzer: $("buzzer"),
+    bed1Btn: $("bed1Btn"), bed2Btn: $("bed2Btn"),
+    clock: $("clock"), fill: $("trackFill"), track: $("track"),
+    phaseNum: $("phaseNum"), phaseName: $("phaseName"),
+    playBtn: $("playBtn"), restartBtn: $("restartBtn"),
+    docBadge: $("docBadge"), docHead: $("docHead"), docBody: $("docBody"),
+    docPatient: $("docPatient"), docBed: $("docBed"),
+    beBadge: $("beBadge"), beHead: $("beHead"), beBody: $("beBody"),
+    beStatus: $("beStatus"), beBed: $("beBed"),
+    stBadge: $("stBadge"), stHead: $("stHead"), stBody: $("stBody"),
+    stBelt: $("stBelt"), stTarget: $("stTarget"),
+    logItems: Array.prototype.slice.call(document.querySelectorAll("#logList li"))
+  };
+
+  // --- helpers -------------------------------------------------------
+  function seg(t, a, b) {
+    if (b <= a) return t >= b ? 1 : 0;
+    return Math.max(0, Math.min(1, (t - a) / (b - a)));
+  }
+  function ease(x) { return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }
+  function set(el, text) { if (el.textContent !== text) el.textContent = text; }
+  function cls(el, name, on) { el.classList.toggle(name, !!on); }
+
+  // Geometry: box rides the belt at y=132, drops to y=282 in the tray.
+  // Which bed is the target is the only thing that changes between runs -
+  // exactly as in the real firmware, where bed_no picks the servo.
+  var X_LOAD = 142, Y_BELT = 132, Y_TRAY = 282;
+  var BEDS = {
+    1: { x: 404, patient: "Anita Rao",   med: "Amoxicillin 250mg × 1" },
+    2: { x: 624, patient: "Ramesh Kumar", med: "Paracetamol 500mg × 2" }
+  };
+  var target = 2;
+
+  function applyTargetChrome() {
+    els.bed1Btn.classList.toggle("is-on", target === 1);
+    els.bed2Btn.classList.toggle("is-on", target === 2);
+    // the bed_no in the job-received log line follows the target
+    els.logItems[2].querySelector(".code").nextSibling.textContent =
+      ' {delivery_id, bed_no:"' + target + '"}';
+  }
+
+  // --- the one render function ---------------------------------------
+  function render(t) {
+    var beltOn = t >= 10.0 && t < 16.2;
+    var pushing = seg(t, 16.8, 18.0);
+    var travel = ease(seg(t, 10.3, 15.8));
+    var boxVisible = t >= 7.0;
+
+    // box position — stops at whichever bed this job targets
+    var bed = BEDS[target];
+    var bx = X_LOAD + (bed.x - X_LOAD) * travel;
+    var by = Y_BELT + (Y_TRAY - Y_BELT) * ease(pushing);
+    els.box.setAttribute("transform", "translate(" + bx.toFixed(1) + "," + by.toFixed(1) + ")");
+    els.box.setAttribute("opacity", boxVisible ? (t < 7.6 ? seg(t, 7.0, 7.6).toFixed(2) : "1") : "0");
+
+    // belt motion
+    els.beltLines.setAttribute("stroke-dashoffset", beltOn ? (-t * 150).toFixed(0) : "0");
+    els.beltLines.setAttribute("opacity", beltOn ? "1" : "0.55");
+
+    // only the targeted bed's servo moves; the other stays at rest
+    var rodLen = 18 + 26 * Math.sin(Math.PI * Math.min(1, pushing * 1.15));
+    els.rod1.setAttribute("height", target === 1 ? rodLen.toFixed(1) : "18");
+    els.rod2.setAttribute("height", target === 2 ? rodLen.toFixed(1) : "18");
+
+    // only the targeted bed's IR beam breaks
+    var broken = t >= 15.5 && t < 17.4;
+    [[els.ir1, 1], [els.ir2, 2]].forEach(function (pair) {
+      var g = pair[0], live = broken && target === pair[1];
+      g.querySelector(".beam").setAttribute("stroke", live ? "var(--amber)" : "var(--line-strong)");
+      g.querySelector(".beam").setAttribute("stroke-width", live ? "3" : "2");
+      g.querySelector(".dot").setAttribute("fill", live ? "var(--amber)" : "var(--line-strong)");
+    });
+
+    // target bed highlighted from the moment the job is known
+    var targeted = t >= 5.0;
+    var delivered = t >= 18.0;
+    var bedStroke = delivered ? "var(--accent)" : (targeted ? "var(--amber)" : "var(--line)");
+    [[els.bed1, els.chute1, 1], [els.bed2, els.chute2, 2]].forEach(function (p) {
+      var isTarget = target === p[2];
+      var stroke = isTarget && targeted ? bedStroke : "var(--line)";
+      p[0].querySelector("rect").setAttribute("stroke", stroke);
+      p[0].querySelector("rect").setAttribute("stroke-width", isTarget && targeted ? "3" : "2");
+      p[1].setAttribute("stroke", stroke);
+    });
+
+    // buzzer flashes on job-received and on delivery
+    var buzz = (t >= 5.2 && t < 6.0) || (t >= 18.0 && t < 19.0);
+    els.buzzer.setAttribute("opacity", buzz ? (0.55 + 0.45 * Math.abs(Math.sin(t * 14))).toFixed(2) : "0");
+
+    // ---- station state ----
+    var state, stHead, stBody, stBelt, stTarget, stBadgeCls;
+    if (t < 5.0)       { state = "IDLE";      stHead = "Polling for work";      stBody = "Asks the backend for a job every 4 seconds. No cable to any laptop."; stBelt = "stopped"; stTarget = "—"; stBadgeCls = ""; }
+    else if (t < 9.5)  { state = "LOADING";   stHead = "Job received — Bed " + target;  stBody = "Buzzed once. Waiting for the box and the button press."; stBelt = "stopped"; stTarget = "Bed " + target; stBadgeCls = "live"; }
+    else if (t < 15.5) { state = "RUNNING";   stHead = "Belt running";          stBody = target === 2 ? "Carrying the box past Bed 1 toward the Bed 2 pusher." : "Carrying the box to the Bed 1 pusher."; stBelt = "forward"; stTarget = "Bed " + target; stBadgeCls = "live"; }
+    else if (t < 16.8) { state = "DETECTED";  stHead = "Box at the pusher line"; stBody = "IR " + target + " broke. Belt stops so the push lands square."; stBelt = "stopped"; stTarget = "Bed " + target; stBadgeCls = "live"; }
+    else if (t < 18.5) { state = "PUSHING";   stHead = "Servo " + target + " sweeping";  stBody = "The arm pushes the box off the belt into the Bed " + target + " chute."; stBelt = "stopped"; stTarget = "Bed " + target; stBadgeCls = "live"; }
+    else               { state = "IDLE";      stHead = "Delivered — back to idle"; stBody = "Reported arrival, belt stopped, polling again."; stBelt = "stopped"; stTarget = "—"; stBadgeCls = "done"; }
+
+    set(els.pill, state);
+    set(els.stHead, stHead); set(els.stBody, stBody);
+    set(els.stBelt, stBelt); set(els.stTarget, stTarget);
+    set(els.stBadge, state === "IDLE" ? (t >= 18.5 ? "Done" : "Idle") : "Active");
+    cls(els.stBadge, "live", stBadgeCls === "live");
+    cls(els.stBadge, "done", stBadgeCls === "done");
+
+    // ---- doctor panel ----
+    if (t < 2.5) {
+      set(els.docBadge, "Waiting"); cls(els.docBadge, "live", false); cls(els.docBadge, "done", false);
+      set(els.docHead, "No prescription yet");
+      set(els.docBody, "The doctor picks a patient and writes what they need.");
+      set(els.docPatient, "—"); set(els.docBed, "—");
+    } else {
+      set(els.docBadge, t < 5 ? "Submitting" : "Sent");
+      cls(els.docBadge, "live", t < 5); cls(els.docBadge, "done", t >= 5);
+      set(els.docHead, bed.med);
+      set(els.docBody, "Written against the patient's record — the bed number rides along with the job.");
+      set(els.docPatient, bed.patient); set(els.docBed, String(target));
+    }
+
+    // ---- backend panel ----
+    var beStatus, beHead, beBody, beBadge, beCls;
+    if (t < 2.9)       { beStatus = "—";          beHead = "Queue empty";       beBody = "Every state change is stored and pushed live to the dashboard."; beBadge = "No job"; beCls = ""; }
+    else if (t < 9.8)  { beStatus = "preparing";  beHead = "Job waiting";       beBody = "A delivery record exists. The station has claimed it but nothing has moved yet."; beBadge = "Queued"; beCls = "live"; }
+    else if (t < 18.2) { beStatus = "in_transit"; beHead = "On the belt";       beBody = "Dispatched by the button press. bed_no was snapshotted at this moment."; beBadge = "In transit"; beCls = "live"; }
+    else               { beStatus = "arrived";    beHead = "Delivered to Bed " + target; beBody = "Dashboard tile and the patient's phone both update from this."; beBadge = "Arrived"; beCls = "done"; }
+    set(els.beStatus, beStatus); set(els.beHead, beHead); set(els.beBody, beBody);
+    set(els.beBadge, beBadge); set(els.beBed, t < 2.9 ? "—" : '"' + target + '"');
+    cls(els.beBadge, "live", beCls === "live"); cls(els.beBadge, "done", beCls === "done");
+
+    // ---- log ----
+    els.logItems.forEach(function (li) {
+      cls(li, "on", t >= parseFloat(li.dataset.t));
+    });
+
+    // ---- timeline ----
+    els.fill.style.width = ((t / DURATION) * 100).toFixed(2) + "%";
+    set(els.clock, t.toFixed(1) + "s");
+    var idx = 0;
+    for (var i = 0; i < PHASES.length; i++) if (t >= PHASES[i].t) idx = i;
+    set(els.phaseNum, String(idx + 1));
+    set(els.phaseName, PHASES[idx].name);
+  }
+
+  // --- timeline ticks -------------------------------------------------
+  PHASES.forEach(function (p) {
+    if (p.t === 0) return;
+    var m = document.createElement("span");
+    m.className = "track-mark";
+    m.style.left = ((p.t / DURATION) * 100) + "%";
+    els.track.appendChild(m);
+  });
+
+  // --- clock ----------------------------------------------------------
+  var t = 0, playing = false, last = null;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function frame(now) {
+    if (!playing) return;
+    if (last === null) last = now;
+    t += (now - last) / 1000;
+    last = now;
+    if (t >= DURATION) { t = DURATION; playing = false; els.playBtn.textContent = "Replay"; }
+    render(t);
+    if (playing) requestAnimationFrame(frame);
+  }
+
+  function play() {
+    if (t >= DURATION) t = 0;
+    playing = true; last = null;
+    els.playBtn.textContent = "Pause";
+    requestAnimationFrame(frame);
+  }
+  function pause() { playing = false; last = null; els.playBtn.textContent = "Play"; }
+
+  els.playBtn.addEventListener("click", function () { playing ? pause() : play(); });
+  els.restartBtn.addEventListener("click", function () { t = 0; render(0); if (!playing) play(); });
+
+  // Switching the target bed restarts the run - the routing decision is made
+  // when the job is created, so it can't change mid-delivery.
+  function pickBed(n) {
+    if (target === n) return;
+    target = n;
+    applyTargetChrome();
+    t = 0;
+    render(0);
+    play();
+  }
+  els.bed1Btn.addEventListener("click", function () { pickBed(1); });
+  els.bed2Btn.addEventListener("click", function () { pickBed(2); });
+
+  els.track.addEventListener("click", function (e) {
+    var r = els.track.getBoundingClientRect();
+    t = Math.max(0, Math.min(DURATION, ((e.clientX - r.left) / r.width) * DURATION));
+    last = null;
+    render(t);
+  });
+
+  applyTargetChrome();
+  render(0);
+  if (!reduced) setTimeout(play, 700);
+})();
+</script>

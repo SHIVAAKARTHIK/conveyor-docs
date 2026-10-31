@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conveyor Servo Mount Demo</title>
+<style>
+:root{
+  --bg:#f4f6f4; --panel:#ffffff; --ink:#18201d; --muted:#586661; --line:#d3dad6;
+  --belt:#c9d1cd; --rail:#8f9c96; --teal:#0f766e; --tealbg:#d6eeea; --amber:#d9890b;
+  --box:#e8b84f; --boxline:#9a6a10; --lit:#e11d48; --on:#15803d; --onbg:#dcf3e3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#101513; --panel:#19201d; --ink:#e7eeeb; --muted:#9db0a8; --line:#2b3732;
+    --belt:#2a3531; --rail:#51615a; --teal:#2dd4bf; --tealbg:#12403a; --amber:#f0a73a;
+    --box:#c98f2a; --boxline:#f3d28a; --lit:#fb7185; --on:#4ade80; --onbg:#14341f;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.35rem;margin:0 0 4px;letter-spacing:.2px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:.95rem}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
+svg{width:100%;height:auto;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 12px;font-size:.85rem;color:var(--muted)}
+.chip.on{background:var(--onbg);border-color:var(--on);color:var(--on);font-weight:600}
+.chip.lit{background:transparent;border-color:var(--lit);color:var(--lit);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 14px}
+button,select{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 14px;cursor:pointer}
+button:hover,select:hover{border-color:var(--teal)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+label{font-size:.9rem;color:var(--muted);display:flex;gap:6px;align-items:center}
+.cap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-height:76px}
+.cap b{color:var(--teal)}
+ol{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+ol li{padding:6px 12px;border-radius:8px;color:var(--muted);border:1px solid transparent;font-size:.92rem}
+ol li.act{border-color:var(--teal);background:var(--tealbg);color:var(--ink);font-weight:600}
+.note{color:var(--muted);font-size:.85rem;margin-top:14px}
+text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-reduced-motion: reduce){ .note::after{content:" Animation is shown at normal speed; use Pause to study a step."} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Conveyor with two servo pushers</h1>
+  <p class="sub">Servo 1 on the near side pushes into Bed 1. Servo 2 on the far side pushes into Bed 2.</p>
+
+  <div class="stage">
+    <svg viewBox="0 0 680 360" role="img" aria-label="Animated top view of the conveyor belt, two servo arms, two sensors and two chutes">
+      <defs><clipPath id="beltclip"><rect x="140" y="100" width="400" height="130"/></clipPath></defs>
+
+      <rect x="140" y="100" width="400" height="130" fill="var(--belt)"/>
+      <g clip-path="url(#beltclip)"><g id="stripes" stroke="var(--rail)" stroke-width="2" opacity=".55"></g></g>
+      <rect x="140" y="94" width="400" height="6" fill="var(--rail)"/>
+      <rect x="140" y="230" width="400" height="6" fill="var(--rail)"/>
+
+      <rect x="10" y="104" width="112" height="126" rx="8" fill="none" stroke="var(--rail)" stroke-dasharray="4 3"/>
+      <text x="66" y="97" text-anchor="middle" font-size="12" fill="var(--muted)">control panel</text>
+      <circle id="btnC" cx="34" cy="142" r="14" fill="var(--panel)" stroke="var(--ink)" stroke-width="2"/>
+      <text x="56" y="146" font-size="12" fill="var(--ink)">Button</text>
+      <circle cx="34" cy="192" r="14" fill="var(--tealbg)" stroke="var(--teal)" stroke-width="2"/>
+      <circle cx="34" cy="192" r="5" fill="var(--teal)"/>
+      <path id="buzW" d="M52 182 Q58 192 52 202 M58 178 Q67 192 58 206" fill="none" stroke="var(--lit)" stroke-width="2" stroke-linecap="round" opacity="0"/>
+      <text x="74" y="196" font-size="12" fill="var(--ink)">Buzzer</text>
+      <rect x="10" y="244" width="112" height="44" rx="4" fill="none" stroke="var(--rail)"/>
+      <text x="66" y="262" text-anchor="middle" font-size="12" fill="var(--muted)">ESP32 and</text>
+      <text x="66" y="278" text-anchor="middle" font-size="12" fill="var(--muted)">L298N driver</text>
+
+      <rect x="140" y="242" width="100" height="30" rx="4" fill="none" stroke="var(--rail)"/>
+      <text x="190" y="261" text-anchor="middle" font-size="12" fill="var(--muted)">motor and gears</text>
+
+      <rect x="250" y="16" width="90" height="76" rx="6" fill="var(--tealbg)" stroke="var(--teal)"/>
+      <text x="295" y="11" text-anchor="middle" font-size="12" fill="var(--teal)" font-weight="600">Bed 1 chute</text>
+      <rect x="412" y="240" width="138" height="95" rx="6" fill="var(--tealbg)" stroke="var(--teal)"/>
+      <text x="481" y="351" text-anchor="middle" font-size="12" fill="var(--teal)" font-weight="600">Bed 2 chute</text>
+
+      <line id="beamA" x1="340" y1="100" x2="340" y2="262" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <line id="beamB" x1="500" y1="68" x2="500" y2="230" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <rect id="sensA" x="328" y="262" width="24" height="20" rx="3" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="340" y="276" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">A</text>
+      <rect id="sensB" x="488" y="48" width="24" height="20" rx="3" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="500" y="62" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">B</text>
+
+      <rect x="250" y="240" width="48" height="24" rx="3" fill="var(--teal)"/>
+      <text x="274" y="284" text-anchor="middle" font-size="12" fill="var(--muted)">Servo 1 (D18)</text>
+      <rect x="382" y="66" width="48" height="24" rx="3" fill="var(--teal)"/>
+      <text x="420" y="58" text-anchor="middle" font-size="12" fill="var(--muted)">Servo 2 (D19)</text>
+
+      <g id="armA"><rect x="260" y="249" width="150" height="6" rx="2" fill="var(--amber)"/><rect x="370" y="244" width="40" height="16" rx="2" fill="var(--amber)"/></g>
+      <g id="armB"><rect x="390" y="75" width="150" height="6" rx="2" fill="var(--amber)"/><rect x="500" y="70" width="40" height="16" rx="2" fill="var(--amber)"/></g>
+      <circle cx="260" cy="252" r="4" fill="var(--panel)" stroke="var(--ink)"/>
+      <circle cx="390" cy="78" r="4" fill="var(--panel)" stroke="var(--ink)"/>
+
+      <g id="box"><rect width="80" height="60" rx="4" fill="var(--box)" stroke="var(--boxline)" stroke-width="1.5"/><text x="40" y="35" text-anchor="middle" font-size="12" font-weight="600" fill="#2b1d00">medicine</text></g>
+    </svg>
+  </div>
+
+  <div class="chips" aria-live="off">
+    <span class="chip" id="cBelt">Belt: stopped</span>
+    <span class="chip" id="cA">Sensor A</span>
+    <span class="chip" id="cB">Sensor B</span>
+    <span class="chip" id="cBtn">Button</span>
+    <span class="chip" id="cBuz">Buzzer</span>
+  </div>
+
+  <div class="controls">
+    <button id="play" type="button">Pause</button>
+    <label>Deliver to
+      <select id="mode"><option value="alt">alternate beds</option><option value="1">Bed 1 only</option><option value="2">Bed 2 only</option></select>
+    </label>
+    <label>Speed
+      <select id="speed"><option value="1">normal</option><option value="0.5">slow</option><option value="2">fast</option></select>
+    </label>
+    <label><input type="checkbox" id="snd"> sound</label>
+  </div>
+
+  <div class="cap" id="cap"></div>
+  <ol id="steps"></ol>
+
+  <p class="note">Sensor positions are illustrative: each sensor is mounted so the box is inside its servo's sweep zone when it triggers. Exact positions are fixed on the real belt during assembly.</p>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var BOXW = 80, BOX_X0 = 130, BOX_Y0 = 135;
+  var TRIG = { 1: 340, 2: 500 };
+  var END_Y = { 1: 26, 2: 250 };
+  var STEPS = [
+    "Nurse loads the box and presses the button",
+    "Belt starts and carries the box forward",
+    "Sensor sees the box and the belt stops",
+    "Servo swings its arm across the belt",
+    "Box drops into the bed's chute and the buzzer sounds"
+  ];
+  var CAPS = [
+    function (b) { return "<b>Load.</b> A nurse puts the medicine box at the start of the belt and presses the button. The buzzer chirps once. This delivery is for Bed " + b + "."; },
+    function (b) { return "<b>Run.</b> The ESP32 starts the belt motor through the L298N driver. The box heads for the Bed " + b + " pusher."; },
+    function (b) { return "<b>Detect.</b> Sensor " + (b === 1 ? "A" : "B") + " sees the box right at the Bed " + b + " pusher. The ESP32 stops the belt."; },
+    function (b) { return "<b>Push.</b> Servo " + b + " swings its arm across the belt and shoves the box off the " + (b === 1 ? "far" : "near") + " side."; },
+    function (b) { return "<b>Deliver.</b> The box lands in the Bed " + b + " chute. The buzzer sounds and the delivery is reported to the hospital system."; }
+  ];
+
+  var ol = $("steps");
+  STEPS.forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ol.appendChild(li); });
+  var lis = ol.children;
+
+  var stripes = $("stripes");
+  for (var i = -1; i < 12; i++) {
+    var ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    ln.setAttribute("x1", 140 + i * 40); ln.setAttribute("x2", 140 + i * 40 - 12);
+    ln.setAttribute("y1", 100); ln.setAttribute("y2", 230);
+    stripes.appendChild(ln);
+  }
+
+  var st = { phase: "load", t: 0, target: 1, x: BOX_X0, y: BOX_Y0, armA: 0, armB: 0,
+             belt: false, beltOff: 0, sens: 0, pressed: false, buz: 0, running: true, step: 0 };
+  var speed = 1, audio = null;
+
+  function ease(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+  function beep(ms) {
+    if (!$("snd").checked) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      var o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = 880; g.gain.value = 0.06;
+      o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + ms / 1000);
+    } catch (e) {}
+  }
+  function setStep(n) {
+    st.step = n;
+    $("cap").innerHTML = CAPS[n](st.target);
+    for (var i = 0; i < lis.length; i++) lis[i].className = i === n ? "act" : "";
+  }
+  function nextTarget() {
+    var m = $("mode").value;
+    return m === "alt" ? 3 - st.target : parseInt(m, 10);
+  }
+
+  function step(dt) {
+    st.t += dt;
+    if (st.buz > 0) st.buz -= dt;
+    switch (st.phase) {
+      case "load":
+        if (st.t >= .8 && !st.pressed) { st.pressed = true; st.buz = .4; beep(120); }
+        if (st.t >= 1.7) { st.phase = "run"; st.t = 0; st.belt = true; setStep(1); }
+        break;
+      case "run":
+        st.x += 95 * dt;
+        if (st.x + BOXW >= TRIG[st.target]) {
+          st.x = TRIG[st.target] - BOXW; st.phase = "sense"; st.t = 0;
+          st.belt = false; st.sens = st.target; setStep(2);
+        }
+        break;
+      case "sense":
+        if (st.t >= .7) { st.phase = "push"; st.t = 0; setStep(3); }
+        break;
+      case "push": {
+        var p = Math.min(1, st.t / 1.0), e = ease(p);
+        var a = (st.target === 1 ? -90 : 90) * e;
+        if (st.target === 1) st.armA = a; else st.armB = a;
+        var k = Math.max(0, (e - .15) / .85);
+        st.y = BOX_Y0 + (END_Y[st.target] - BOX_Y0) * k;
+        if (p >= 1) { st.phase = "deliver"; st.t = 0; st.buz = .5; beep(300); setStep(4); }
+        break; }
+      case "deliver":
+        if (st.t >= 1.4) { st.phase = "return"; st.t = 0; st.sens = 0; }
+        break;
+      case "return": {
+        var q = Math.min(1, st.t / .8), r = 1 - ease(q);
+        if (st.target === 1) st.armA = -90 * r; else st.armB = 90 * r;
+        if (q >= 1) { st.phase = "reset"; st.t = 0; }
+        break; }
+      case "reset":
+        if (st.t >= .6) {
+          st.x = BOX_X0; st.y = BOX_Y0; st.target = nextTarget();
+          st.pressed = false; st.phase = "load"; st.t = 0; setStep(0);
+        }
+        break;
+    }
+    if (st.belt) st.beltOff = (st.beltOff + 95 * dt) % 40;
+  }
+
+  function chip(id, text, cls) { var e = $(id); e.textContent = text; e.className = "chip" + (cls ? " " + cls : ""); }
+  function draw() {
+    $("box").setAttribute("transform", "translate(" + st.x.toFixed(1) + "," + st.y.toFixed(1) + ")");
+    $("armA").setAttribute("transform", "rotate(" + st.armA.toFixed(1) + " 260 252)");
+    $("armB").setAttribute("transform", "rotate(" + st.armB.toFixed(1) + " 390 78)");
+    stripes.setAttribute("transform", "translate(" + st.beltOff.toFixed(1) + ",0)");
+    var litA = st.sens === 1, litB = st.sens === 2;
+    $("beamA").setAttribute("stroke", litA ? "var(--lit)" : "var(--muted)");
+    $("beamB").setAttribute("stroke", litB ? "var(--lit)" : "var(--muted)");
+    $("sensA").setAttribute("stroke", litA ? "var(--lit)" : "var(--muted)");
+    $("sensB").setAttribute("stroke", litB ? "var(--lit)" : "var(--muted)");
+    var pr = st.pressed && st.phase === "load";
+    $("btnC").setAttribute("fill", pr ? "var(--on)" : "var(--panel)");
+    $("buzW").setAttribute("opacity", st.buz > 0 ? "1" : "0");
+    chip("cBelt", st.belt ? "Belt: running" : "Belt: stopped", st.belt ? "on" : "");
+    chip("cA", litA ? "Sensor A: box seen" : "Sensor A: clear", litA ? "lit" : "");
+    chip("cB", litB ? "Sensor B: box seen" : "Sensor B: clear", litB ? "lit" : "");
+    chip("cBtn", st.pressed && st.phase === "load" ? "Button: pressed" : "Button", st.pressed && st.phase === "load" ? "on" : "");
+    chip("cBuz", st.buz > 0 ? "Buzzer: beep" : "Buzzer", st.buz > 0 ? "on" : "");
+  }
+
+  var last = 0;
+  function frame(ts) {
+    if (!last) last = ts;
+    var dt = Math.min(.05, (ts - last) / 1000) * speed; last = ts;
+    if (st.running) step(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  $("play").addEventListener("click", function () {
+    st.running = !st.running; this.textContent = st.running ? "Pause" : "Play";
+  });
+  $("speed").addEventListener("change", function () { speed = parseFloat(this.value); });
+  setStep(0);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
