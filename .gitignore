@@ -15,3 +15,6 @@
 
 # Phase 1 submission, kept out until the owner says it can be shared
 /PHASE 1 REPORT FF.pdf
+
+# Private files with credentials: never commit
+/private/

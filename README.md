@@ -18,7 +18,7 @@ three other repositories:
 
 | Folder | Contents |
 |---|---|
-| [`docs/`](./docs) | Project report (Word and PDF), presentation (PowerPoint and PDF), and the plans: [hardware plan with the wiring](./docs/phase-3-conveyor-plan.md), [phase 2](./docs/phase-2-plan.md), [phase 4](./docs/phase-4-web-and-connectivity-plan.md) |
+| [`docs/`](./docs) | **[Setup and user guide (PDF)](./docs/MediDispense-How-To-Create-A-Job.pdf): start here** (install on a new computer, logins, create and run a job, wiring, troubleshooting). Also the project report (Word and PDF), presentation (PowerPoint and PDF), and the plans: [hardware plan with the wiring](./docs/phase-3-conveyor-plan.md), [phase 2](./docs/phase-2-plan.md), [phase 4](./docs/phase-4-web-and-connectivity-plan.md) |
 | [`demo/`](./demo) | Animated demos. Open the HTML files in a browser, no install needed. |
 
 ## How it fits together
@@ -52,12 +52,15 @@ Bed 1 uses sensor A and servo 1; Bed 2 uses sensor B and servo 2.
 
 ## Running it
 
-1. **Backend:** follow the backend repo's README, then
-   `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`. On first run it
-   creates a default admin; change that password.
+The full step-by-step version, with the demo logins, is in the [setup and user guide](./docs/MediDispense-How-To-Create-A-Job.pdf). In short:
+
+1. **Backend:** follow the backend repo's README: install, `python seed_demo.py`
+   (adds the demo admin, doctors, nurses and technician), then
+   `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`. The demo
+   passwords are public, so change them before real use.
 2. **Web app:** `npm install`, then `npm run dev`, and open http://localhost:3000.
-   Staff accounts (doctor, nurse, technician) are created by the admin on the
-   Staff page. Create one technician account for the conveyor station.
+   Staff accounts come from the demo data; more can be created by the admin on
+   the Staff page. The conveyor station logs in as its own technician account.
 3. **Conveyor:** wire it as in the [hardware plan](./docs/phase-3-conveyor-plan.md),
    copy `config.h.example` to `config.h` in the firmware repo, fill in the WiFi
    and station login, then build and flash with `arduino-cli`.
