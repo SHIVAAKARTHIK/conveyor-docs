@@ -78,6 +78,6 @@ The full step-by-step version, with the demo logins, is in the [setup and user g
 ## Notes
 
 - Hardware parts cost about Rs. 2,210; the bill of materials is in the report
-  and the hardware plan.
+  and the guide.
 - This is a model-scale prototype. It is not a clinical device and has not been
   validated for use with real medicines.
