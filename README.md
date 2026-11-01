@@ -18,8 +18,8 @@ three other repositories:
 
 | Folder | Contents |
 |---|---|
-| [`docs/`](./docs) | **[Setup and user guide (PDF)](./docs/MediDispense-How-To-Create-A-Job.pdf): start here** (install on a new computer, logins, create and run a job, wiring, troubleshooting). Also the project report (Word and PDF), presentation (PowerPoint and PDF), and the plans: [hardware plan with the wiring](./docs/phase-3-conveyor-plan.md), [phase 2](./docs/phase-2-plan.md), [phase 4](./docs/phase-4-web-and-connectivity-plan.md) |
-| [`demo/`](./demo) | Animated demos. Open the HTML files in a browser, no install needed. |
+| [`docs/`](./docs) | **[Setup and user guide (PDF)](./docs/MediDispense-How-To-Create-A-Job.pdf): start here** (install on a new computer, logins, create and run a job, wiring, troubleshooting). Also the [project report](./docs/MediDispense-Project-Report-from-Abstract.pdf) (PDF and Word) and the [presentation](./docs/MediDispense-Presentation.pptx). |
+| [`demo/`](./demo) | [Animated servo-mount demo](./demo/MediDispense-Servo-Mount-Demo.html): open the HTML file in a browser, no install needed. |
 
 ## How it fits together
 
@@ -61,7 +61,7 @@ The full step-by-step version, with the demo logins, is in the [setup and user g
 2. **Web app:** `npm install`, then `npm run dev`, and open http://localhost:3000.
    Staff accounts come from the demo data; more can be created by the admin on
    the Staff page. The conveyor station logs in as its own technician account.
-3. **Conveyor:** wire it as in the [hardware plan](./docs/phase-3-conveyor-plan.md),
+3. **Conveyor:** wire it as in section 5 of the [guide](./docs/MediDispense-How-To-Create-A-Job.pdf),
    copy `config.h.example` to `config.h` in the firmware repo, fill in the WiFi
    and station login, then build and flash with `arduino-cli`.
 
